@@ -71,7 +71,9 @@ def plot_trials(csv):
 		return
 	
 	# Create additional features
-	data['average_reward'] = pd.rolling_mean(data['net_reward'] / (data['initial_deadline'] - data['final_deadline']), 10)
+	data['average_reward'] = (
+            data['net_reward'] / (data['initial_deadline'] - data['final_deadline'])
+        ).rolling(window=10,center=False).mean()
 	data['reliability_rate'] = pd.rolling_mean(data['success']*100, 10)  # compute avg. net reward with window=10
 	data['good_actions'] = data['actions'].apply(lambda x: ast.literal_eval(x)[0])
 	data['good'] = pd.rolling_mean(data['good_actions'] * 1.0 / \

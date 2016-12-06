@@ -36,7 +36,7 @@ class LearningAgent(Agent):
         # Update epsilon using a decay function of your choice
         # Update additional class parameters as needed
         # If 'testing' is True, set epsilon and alpha to 0
-        self.epsilon = self.epsilon - 0.05
+        self.epsilon = self.epsilon - 0.05 #self.epsilon = 1.0/(self.trial**2)
         if testing == True:
             self.alpha = 0
             self.epsilon = 0
@@ -86,9 +86,17 @@ class LearningAgent(Agent):
             maximum Q-value of all actions based on the 'state' the smartcab is in. """
 
         # Calculate the maximum Q-value of all actions for a given state
-        maxQ = max(self.Q[state]) # Returns and ACTION
+        best_action = 'TBD'
+        for a in self.valid_actions:
+            if best_action == 'TBD': 
+                best_action = a
+            elif self.Q[state][str(best_action)] < self.Q[state][str(a)]:
+                best_action = a
+                
+        print 'State, Q', state, self.Q[state]
+        print 'Best Action? = ', best_action
 
-        return maxQ 
+        return best_action 
 
 
     def choose_action(self, state):
@@ -179,7 +187,7 @@ def run():
     #   display      - set to False to disable the GUI if PyGame is enabled
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
-    sim = Simulator(env,display=False,log_metrics=True,update_delay = 0.01)
+    sim = Simulator(env,update_delay=0.01,display=False,log_metrics=True)
 
     ##############
     # Run the simulator

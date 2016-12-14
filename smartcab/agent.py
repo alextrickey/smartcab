@@ -32,15 +32,17 @@ class LearningAgent(Agent):
         self.planner.route_to(destination)
         
         # Update epsilon using a decay function of your choice
+        #self.epsilon = self.epsilon - 0.05 
         #self.epsilon = self.alpha**(self.trial)
         #self.epsilon = math.cos(self.alpha*self.trial)
-        #self.epsilon = 1 - (self.trial/20.0)**2
+        #self.epsilon = 1 - (self.trial/20.0)**2 #No good
         #self.epsilon = self.alpha**self.trial * (1 + math.cos(math.pi/2 * self.trial))/2 # Best with alpha = 0.5
-        self.epsilon = 0.5**self.trial * (1 + math.cos(math.pi * self.trial))/2 
+        #self.epsilon = 0.5**self.trial * (1 + math.cos(math.pi * self.trial))/2 
         #self.epsilon = (1 - self.trial*0.05) * (1 + math.cos(math.pi/2 * self.trial))/2 
         self.trial += 1
-        #self.epsilon = 1.0 / self.trial
-        #self.epsilon = self.epsilon - 0.05 
+        self.epsilon = self.alpha if self.trial <= 5 else self.alpha**(self.trial - 5)
+        #self.epsilon = (1.0 / self.trial**2) * (1 + math.cos(math.pi/2 * (self.trial)))/2 
+        #self.epsilon = 1.0 / self.trial #Really terrible
         #self.epsilon = 1.0/(self.trial**2)
 
         if testing == True:
@@ -178,7 +180,7 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent,learning=True,alpha=0.8)
+    agent = env.create_agent(LearningAgent,learning=True,alpha=0.6)
     
     ##############
     # Follow the driving agent
@@ -200,7 +202,7 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test=100,tolerance=0.01)
+    sim.run(n_test=100,tolerance=0.05)
 
 
 if __name__ == '__main__':

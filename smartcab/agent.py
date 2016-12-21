@@ -81,7 +81,7 @@ class LearningAgent(Agent):
 
 
         # Set 'state' as a tuple of relevant data for the agent        
-        state = (waypoint,inputs['light'],inputs['oncoming'])
+        state = (waypoint,inputs['light'],inputs['oncoming'],inputs['left'])
 
         # When learning, check if the state is in the Q-table
         #   If it is not, create a dictionary in the Q-table for the current 'state'

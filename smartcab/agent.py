@@ -37,6 +37,10 @@ class LearningAgent(Agent):
         #self.epsilon = math.exp(-self.trial * 0.2)
         #self.epsilon = 1.0 - 1.0/(1.0 + math.exp(-0.2*(self.trial - 20.0)))
         
+        #self.epsilon = self.epsilon - 0.05 
+        #self.epsilon = self.alpha**(self.trial)
+        #self.epsilon = 1.0 - 1.0/(1.0 + math.exp(-0.7*(self.trial - 5.0)))
+        
         #self.epsilon = math.cos(self.alpha*self.trial)
         #self.epsilon = 1 - (self.trial/20.0)**2 #No good
         #self.epsilon = self.alpha**self.trial * (1 + math.cos(math.pi/2 * self.trial))/2 # Best with alpha = 0.5

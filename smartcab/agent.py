@@ -32,10 +32,10 @@ class LearningAgent(Agent):
         self.planner.route_to(destination)
         
         # Update epsilon using a decay function of your choice
-        #self.epsilon = self.epsilon - 0.0125 
+        self.epsilon = self.epsilon - 0.01 
         #self.epsilon = 0.7**(self.trial)
         #self.epsilon = math.exp(-self.trial * 0.2)
-        self.epsilon = 1.0 - 1.0/(1.0 + math.exp(-0.2*(self.trial - 10.0)))
+        #self.epsilon = 1.0 - 1.0/(1.0 + math.exp(-0.2*(self.trial - 20.0)))
         
         #self.epsilon = math.cos(self.alpha*self.trial)
         #self.epsilon = 1 - (self.trial/20.0)**2 #No good
@@ -81,7 +81,7 @@ class LearningAgent(Agent):
 
 
         # Set 'state' as a tuple of relevant data for the agent        
-        state = (waypoint,inputs['light'],inputs['oncoming'],inputs['left'])
+        state = (waypoint,inputs['light'],inputs['oncoming'])#,inputs['left'])
 
         # When learning, check if the state is in the Q-table
         #   If it is not, create a dictionary in the Q-table for the current 'state'
@@ -104,8 +104,8 @@ class LearningAgent(Agent):
             elif self.Q[state][str(best_action)] < self.Q[state][str(a)]:
                 best_action = a
                 
-        print 'State, Q', state, self.Q[state]
-        print 'Best Action? = ', best_action
+        #print 'State, Q', state, self.Q[state]
+        #print 'Best Action? = ', best_action
 
         return best_action 
 
@@ -205,7 +205,7 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test=100,tolerance=0.05)
+    sim.run(n_test=100,tolerance=0.02)
 
 
 if __name__ == '__main__':

@@ -33,24 +33,8 @@ class LearningAgent(Agent):
         
         # Update epsilon using a decay function of your choice
         self.epsilon = self.epsilon - 0.01 
-        #self.epsilon = 0.7**(self.trial)
-        #self.epsilon = math.exp(-self.trial * 0.2)
-        #self.epsilon = 1.0 - 1.0/(1.0 + math.exp(-0.2*(self.trial - 20.0)))
+        #self.trial += 1
         
-        #self.epsilon = self.epsilon - 0.05 
-        #self.epsilon = self.alpha**(self.trial)
-        #self.epsilon = 1.0 - 1.0/(1.0 + math.exp(-0.7*(self.trial - 5.0)))
-        
-        #self.epsilon = math.cos(self.alpha*self.trial)
-        #self.epsilon = 1 - (self.trial/20.0)**2 #No good
-        #self.epsilon = self.alpha**self.trial * (1 + math.cos(math.pi/2 * self.trial))/2 # Best with alpha = 0.5
-        #self.epsilon = 0.5**self.trial * (1 + math.cos(math.pi * self.trial))/2 
-        #self.epsilon = (1 - self.trial*0.05) * (1 + math.cos(math.pi/2 * self.trial))/2 
-        self.trial += 1
-        #self.epsilon = self.alpha if self.trial <= 5 else self.alpha**(self.trial - 5)
-        #self.epsilon = (1.0 / self.trial**2) * (1 + math.cos(math.pi/2 * (self.trial)))/2 
-        #self.epsilon = 1.0 / self.trial #Really terrible
-        #self.epsilon = 1.0/(self.trial**2)
 
         if testing == True:
             self.alpha = 0
@@ -85,7 +69,7 @@ class LearningAgent(Agent):
 
 
         # Set 'state' as a tuple of relevant data for the agent        
-        state = (waypoint,inputs['light'],inputs['oncoming'])#,inputs['left'])
+        state = (waypoint,inputs['light'],inputs['oncoming'],inputs['left'])
 
         # When learning, check if the state is in the Q-table
         #   If it is not, create a dictionary in the Q-table for the current 'state'
@@ -209,7 +193,7 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test=100,tolerance=0.02)
+    sim.run(tolerance=0.05,n_test=100)
 
 
 if __name__ == '__main__':

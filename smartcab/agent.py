@@ -32,9 +32,31 @@ class LearningAgent(Agent):
         self.planner.route_to(destination)
         
         # Update epsilon using a decay function of your choice
-        self.epsilon = self.epsilon - 0.01 
-        #self.trial += 1
+        self.trial += 1
+
+        #Linear
+        tol = 0.05
+        #a = (1.0-tol)/100.0
+        #self.epsilon = self.epsilon - a
         
+        #Exponential (a^t equivalent to exp(-at) for this choice of a)
+        #a = math.log(tol)/100.0
+        #self.epsilon = math.exp(a*self.trial)
+        
+        #Rational (Linear Denominator)
+        #a = (1.0-tol)/(99.0*tol)
+        #b = 1.0-a
+        #self.epsilon = 1/(a*self.trial + b)
+                
+        #Rational (Polynomial Denominator)
+        #a = (1-tol)/((100**2-1)*tol)
+        #b = 1-a
+        #self.epsilon = 1/(a*(self.trial**2) + b)
+        
+        #Logistic
+        a = math.log((tol-1)**2/(tol**2)) / 99
+        b = - math.log(1.0-1.0/tol) - a
+        self.epsilon = 1 - 1/(1-math.exp(-(a*self.trial+b)))    
 
         if testing == True:
             self.alpha = 0
@@ -69,7 +91,7 @@ class LearningAgent(Agent):
 
 
         # Set 'state' as a tuple of relevant data for the agent        
-        state = (waypoint,inputs['light'],inputs['oncoming'],inputs['left'])
+        state = (waypoint,inputs['light'],inputs['oncoming'])#,inputs['left'])
 
         # When learning, check if the state is in the Q-table
         #   If it is not, create a dictionary in the Q-table for the current 'state'

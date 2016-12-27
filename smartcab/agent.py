@@ -54,9 +54,9 @@ class LearningAgent(Agent):
         #self.epsilon = 1/(a*(self.trial**2) + b)
         
         #Logistic
-        a = math.log((tol-1)**2/(tol**2)) / 99
-        b = - math.log(1.0-1.0/tol) - a
-        self.epsilon = 1 - 1/(1-math.exp(-(a*self.trial+b)))    
+        a = math.log((1-tol)**2/(tol**2)) / 99.0
+        b = - math.log((1.0-tol)/tol) - a
+        self.epsilon = 1.0 - 1.0/(1.0-math.exp(-(a*self.trial+b)))
 
         if testing == True:
             self.alpha = 0

@@ -54,9 +54,12 @@ class LearningAgent(Agent):
         #self.epsilon = 1/(a*(self.trial**2) + b)
         
         #Logistic
-        a = math.log((1-tol)**2/(tol**2)) / 99.0
-        b = - math.log((1.0-tol)/tol) - a
-        self.epsilon = 1.0 - 1.0/(1.0-math.exp(-(a*self.trial+b)))
+        a = math.log(((tol)**2)/((1-tol)**2)) / 99.0
+        b = math.log((1.0-tol)/tol) - a
+        self.epsilon = 1.0-1.0/(1.0+math.exp(a*self.trial+b))
+
+        if self.epsilon < 0 or self.epsilon > 1: 
+            raise NameError('Epsilon out of bounds.')
 
         if testing == True:
             self.alpha = 0
@@ -215,7 +218,7 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(tolerance=0.05,n_test=100)
+    sim.run(tolerance=0.05,n_test=1000)
 
 
 if __name__ == '__main__':

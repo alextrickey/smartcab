@@ -36,8 +36,8 @@ class LearningAgent(Agent):
 
         #Linear
         tol = 0.05
-        a = (1.0-tol)/100.0
-        self.epsilon = self.epsilon - a
+        #a = (1.0-tol)/100.0
+        #self.epsilon = self.epsilon - a
         
         #Exponential (a^t equivalent to exp(-at) for this choice of a)
         #a = math.log(tol)/100.0
@@ -54,12 +54,12 @@ class LearningAgent(Agent):
         #self.epsilon = 1/(a*(self.trial**2) + b)
         
         #Logistic
-        #a = math.log(((tol)**2)/((1-tol)**2)) / 99.0
-        #b = math.log((1.0-tol)/tol) - a
-        #self.epsilon = 1.0-1.0/(1.0+math.exp(a*self.trial+b))
+        a = math.log(((tol)**2)/((1-tol)**2)) / 99.0
+        b = math.log((1.0-tol)/tol) - a
+        self.epsilon = 1.0-1.0/(1.0+math.exp(a*self.trial+b))
 
-        if self.epsilon < 0 or self.epsilon > 1: 
-            raise NameError('Epsilon out of bounds.')
+        #if self.epsilon < 0 or self.epsilon > 1: 
+        #    raise NameError('Epsilon out of bounds.')
 
         if testing == True:
             self.alpha = 0

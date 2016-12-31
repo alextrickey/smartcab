@@ -46,18 +46,18 @@ def calculate_reliability(data):
 	success_ratio = data['success'].sum() * 1.0 / len(data)
 
 	if success_ratio == 1: # Always meets deadline
-		return ("A+", "green")
+		return ("A+", "green",success_ratio)
 	else:
 		if success_ratio >= 0.90:
-			return ("A", "green")
+			return ("A", "green",success_ratio)
 		elif success_ratio >= 0.80:
-			return ("B", "green")
+			return ("B", "green",success_ratio)
 		elif success_ratio >= 0.70:
-			return ("C", "#EEC700")
+			return ("C", "#EEC700",success_ratio)
 		elif success_ratio >= 0.60:
-			return ("D", "#EEC700")
+			return ("D", "#EEC700",success_ratio)
 		else:
-			return ("F", "red")
+			return ("F", "red",success_ratio)
 
 
 def plot_trials(csv):
@@ -193,14 +193,15 @@ def plot_trials(csv):
 
 	if len(testing_data) > 0:
 		safety_rating, safety_color = calculate_safety(testing_data)
-		reliability_rating, reliability_color = calculate_reliability(testing_data)
+		reliability_rating, reliability_color, rel_ratio = calculate_reliability(testing_data)
 
 		# Write success rate
 		ax.text(0.40, .9, "{} testing trials simulated.".format(len(testing_data)), fontsize=14, ha='center')
 		ax.text(0.40, 0.7, "Safety Rating:", fontsize=16, ha='center')
 		ax.text(0.40, 0.42, "{}".format(safety_rating), fontsize=40, ha='center', color=safety_color)
 		ax.text(0.40, 0.27, "Reliability Rating:", fontsize=16, ha='center')
-		ax.text(0.40, 0, "{}".format(reliability_rating), fontsize=40, ha='center', color=reliability_color)
+		ax.text(0.40, 0, "{}".format(reliability_rating + "--" + str(rel_ratio)), 
+                                fontsize=40, ha='center', color=reliability_color)
 
 	else:
 		ax.text(0.36, 0.30, "Simulation completed\nwith testing disabled.", fontsize=20, ha='center', style='italic')	

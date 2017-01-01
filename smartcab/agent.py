@@ -34,29 +34,33 @@ class LearningAgent(Agent):
         # Update epsilon using a decay function of your choice
         self.trial += 1
 
+        #Set to 
+        tol = 0.05 #Generally same as self.tolerance
+        n = 100.0  #Number of trials
+
         #Linear
-        tol = 0.05
-        #a = (1.0-tol)/100.0
+        #a = (1.0-tol)/n
         #self.epsilon = self.epsilon - a
         
+        #Use this one:
         #Exponential (a^t equivalent to exp(-at) for this choice of a)
-        #a = math.log(tol)/100.0
-        #self.epsilon = math.exp(a*self.trial)
+        a = math.log(tol)/n
+        self.epsilon = math.exp(a*self.trial)
         
         #Rational (Linear Denominator)
-        #a = (1.0-tol)/(99.0*tol)
+        #a = (1.0-tol)/((n-1.0)*tol)
         #b = 1.0-a
         #self.epsilon = 1/(a*self.trial + b)
                 
         #Rational (Polynomial Denominator)
-        #a = (1-tol)/((100**2-1)*tol)
+        #a = (1-tol)/((n**2-1)*tol)
         #b = 1-a
         #self.epsilon = 1/(a*(self.trial**2) + b)
         
         #Logistic
-        a = math.log(((tol)**2)/((1-tol)**2)) / 99.0
-        b = math.log((1.0-tol)/tol) - a
-        self.epsilon = 1.0-1.0/(1.0+math.exp(a*self.trial+b))
+        #a = math.log(((tol)**2)/((1-tol)**2)) / (n-1.0)
+        #b = math.log((1.0-tol)/tol) - a
+        #self.epsilon = 1.0-1.0/(1.0+math.exp(a*self.trial+b))
 
         #if self.epsilon < 0 or self.epsilon > 1: 
         #    raise NameError('Epsilon out of bounds.')
@@ -180,8 +184,8 @@ def run():
         Press ESC to close the simulation, or [SPACE] to pause the simulation. """
     
     #Set Random Seed
-    #random.seed(1921)
-    random.seed(1557)
+    random.seed(1921) #seed 1
+    #random.seed(1557) #seed 2
     
     ##############
     # Create the environment
@@ -197,7 +201,7 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent,learning=True,alpha=0.5)
+    agent = env.create_agent(LearningAgent,learning=True,alpha=0.4)
     
     ##############
     # Follow the driving agent
@@ -219,7 +223,7 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(tolerance=0.05,n_test=1000)
+    sim.run(tolerance=0.05,n_test=100)
 
 
 if __name__ == '__main__':

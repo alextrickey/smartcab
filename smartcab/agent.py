@@ -26,7 +26,7 @@ class LearningAgent(Agent):
     def reset(self, destination=None, testing=False, trial = 0):
         """ The reset function is called at the beginning of each trial.
             'testing' is set to True if testing trials are being used
-            once training trials have completed. """
+            once training trials have completed. """ 
 
         # Select the destination as the new location to route to
         self.planner.route_to(destination)
@@ -37,20 +37,19 @@ class LearningAgent(Agent):
         else:
             # Update epsilon using a decay function of your choice
             self.trial += 1
-
-            #Set to 
-            tol = 0.05 #Generally same as self.tolerance
-            n = 100.0  #Number of trials
-
+            
+            #Epsilon Decay Function Parameters
+            n = 150.0  #Number of trials
+            tol = 0.05 #Epsilon value on nth trial 
+            
             #Linear
             #a = (1.0-tol)/n
             #self.epsilon = self.epsilon - a
         
-            #Use this one:
             #Exponential (a^t equivalent to exp(-at) for this choice of a)
             a = math.log(tol)/n
             self.epsilon = math.exp(a*self.trial)
-        
+            
             #Rational (Linear Denominator)
             #a = (1.0-tol)/((n-1.0)*tol)
             #b = 1.0-a
@@ -78,11 +77,13 @@ class LearningAgent(Agent):
         # If it is not, create a new dictionary for that state
         #   Then, for each action available, set the initial Q-value to 0.0
         #   For each action, set the Q-value for the state-action pair to 0
+        # Updated initial value to 10 based upon this feedback in the forums:
+        # https://discussions.udacity.com/t/in-which-function-do-i-update-the-q-table-and-how/204911/9
         if state not in self.Q.keys():
             action_names = [str(a) for a in self.valid_actions]
             self.Q[state] = {}
             for a in action_names:
-                self.Q[state][a]=0.0
+                self.Q[state][a] = 10.0 
         
         return
 
@@ -100,7 +101,7 @@ class LearningAgent(Agent):
         # Set 'state' as a tuple of relevant data for the agent        
         state = (waypoint,
                 inputs['light'],
-                inputs['oncoming'] != None,
+                inputs['oncoming'],# != None,
                 inputs['left'] != None)
 
         # When learning, check if the state is in the Q-table
@@ -123,11 +124,22 @@ class LearningAgent(Agent):
                 best_action = a
             elif self.Q[state][str(best_action)] < self.Q[state][str(a)]:
                 best_action = a
-                
-        #print 'State, Q', state, self.Q[state]
-        #print 'Best Action? = ', best_action
 
         return best_action 
+        
+    def get_action_set(self, state):
+        """ Return any untested actions for a given state, else return all 
+            actions. """
+
+        # Calculate the maximum Q-value of all actions for a given state
+        action_set = []
+        for a in self.valid_actions:
+            if self.Q[state][str(a)] == 0:
+                action_set.append(a)
+        if len(action_set) == 0:
+            action_set = self.valid_actions
+
+        return action_set 
 
 
     def choose_action(self, state):
@@ -148,9 +160,11 @@ class LearningAgent(Agent):
             #   Otherwise, choose an action with the highest Q-value for the current state
             #self.learning
             if random.random() > self.epsilon:
-                 action = self.get_maxQ(state)
+                action = self.get_maxQ(state)
             else:
-                 action = random.choice(self.valid_actions)
+                #returns set of unexplored actions (or all actions)
+                action = random.choice(self.valid_actions)
+                #action = random.choice(self.get_action_set(state))
  
         return action
 
@@ -186,10 +200,16 @@ def run():
     """ Driving function for running the simulation. 
         Press ESC to close the simulation, or [SPACE] to pause the simulation. """
     
-    #Set Random Seed
+    #Set Random Seed for Reproducibility
     #random.seed(1921) #seed 1
     #random.seed(1557) #seed 2
-    random.seed(1999) #seed 3
+    #random.seed(1999) #seed 3
+    #random.seed(2011)  #seed 4
+    random.seed(1066)  #seed 5
+    #random.seed(1982)  #seed 6
+    #random.seed(327)  #seed 7
+    
+    #Set Test Seeds (Not used for training/parameter tuning)
     
     ##############
     # Create the environment
@@ -205,7 +225,7 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent,learning=True,alpha=0.6)
+    agent = env.create_agent(LearningAgent,learning=True,alpha=0.4)
     
     ##############
     # Follow the driving agent
@@ -220,14 +240,14 @@ def run():
     #   display      - set to False to disable the GUI if PyGame is enabled
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
-    sim = Simulator(env,update_delay=0.01,display=False,log_metrics=True,optimized=True)
+    sim = Simulator(env,update_delay=0.005,display=False,log_metrics=True,optimized=True)
 
     ##############
     # Run the simulator
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(tolerance=0.05,n_test=10)
+    sim.run(tolerance=0.0001,n_test=100)
 
 
 if __name__ == '__main__':

@@ -200,7 +200,7 @@ def plot_trials(csv):
 		ax.text(0.40, 0.7, "Safety Rating:", fontsize=16, ha='center')
 		ax.text(0.40, 0.42, "{}".format(safety_rating), fontsize=40, ha='center', color=safety_color)
 		ax.text(0.40, 0.27, "Reliability Rating:", fontsize=16, ha='center')
-		ax.text(0.40, 0, "{}".format(reliability_rating + "--" + str(rel_ratio)), 
+		ax.text(0.40, 0, "{} ({}%)".format(reliability_rating,rel_ratio*100), 
                                 fontsize=40, ha='center', color=reliability_color)
 
 	else:

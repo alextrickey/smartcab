@@ -49,6 +49,9 @@ class LearningAgent(Agent):
             #Exponential (a^t equivalent to exp(-at) for this choice of a)
             a = math.log(tol)/n
             self.epsilon = math.exp(a*self.trial)
+            #self.epsilon = self.epsilon*(1 + 0.4*(math.cos(math.pi/8*self.trial)))
+            #self.epsilon = min(self.epsilon,1)
+            #self.epsilon = max(self.epsilon,0)
             
             #Rational (Linear Denominator)
             #a = (1.0-tol)/((n-1.0)*tol)
@@ -205,7 +208,7 @@ def run():
     #random.seed(1557) #seed 2
     #random.seed(1999) #seed 3
     #random.seed(2011)  #seed 4
-    random.seed(1066)  #seed 5
+    #random.seed(1066)  #seed 5
     #random.seed(1982)  #seed 6
     #random.seed(327)  #seed 7
     
@@ -240,14 +243,14 @@ def run():
     #   display      - set to False to disable the GUI if PyGame is enabled
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
-    sim = Simulator(env,update_delay=0.005,display=False,log_metrics=True,optimized=True)
+    sim = Simulator(env,update_delay=0.001,display=False,log_metrics=True,optimized=True)
 
     ##############
     # Run the simulator
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(tolerance=0.0001,n_test=100)
+    sim.run(tolerance=0.0005,n_test=100)
 
 
 if __name__ == '__main__':

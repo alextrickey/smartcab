@@ -39,7 +39,7 @@ class LearningAgent(Agent):
             self.trial += 1
             
             #Epsilon Decay Function Parameters
-            n = 150.0  #Number of trials
+            n = 200.0  #Number of trials
             tol = 0.05 #Epsilon value on nth trial 
             
             #Linear
@@ -106,6 +106,8 @@ class LearningAgent(Agent):
                 inputs['light'],
                 inputs['oncoming'],# != None,
                 inputs['left'] != None)
+        # This type of feature transformation was suggested by a Udacity Coach in the forum: 
+        #https://discussions.udacity.com/t/i-dont-know-if-this-idea-is-a-kind-of-cheating/170894
 
         # When learning, check if the state is in the Q-table
         #   If it is not, create a dictionary in the Q-table for the current 'state'
@@ -250,7 +252,7 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(tolerance=0.0005,n_test=100)
+    sim.run(tolerance=0.001,n_test=100)
 
 
 if __name__ == '__main__':

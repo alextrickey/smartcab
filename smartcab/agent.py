@@ -19,53 +19,63 @@ class LearningAgent(Agent):
         self.epsilon = epsilon   # Random exploration factor
         self.alpha = alpha       # Learning factor
 
-        # Set any additional class parameters as needed
+        # Trial Number
         self.trial = 0
+        
+        # Epsilon Decay Function Parameters
+        self.n = 100
+        self.epsilon_val_at_n = 0.002
 
-
-    def reset(self, destination=None, testing=False, trial = 0):
+    def reset(self, destination=None, testing=False):
         """ The reset function is called at the beginning of each trial.
             'testing' is set to True if testing trials are being used
             once training trials have completed. """ 
 
         # Select the destination as the new location to route to
         self.planner.route_to(destination)
-
+        
+        # Set testing learning rate and exploration factor
         if testing == True:
             self.alpha = 0
             self.epsilon = 0
+        
+        # Set training exploration factor
         else:
+            # Linear
+            if self.trial > 0: 
+                self.epsilon = self.epsilon - self.epsilon_val_at_n
+            
             # Update epsilon using a decay function of your choice
             self.trial += 1
             
-            #Epsilon Decay Function Parameters
-            n = 200.0  #Number of trials
-            tol = 0.05 #Epsilon value on nth trial 
-            
-            #Linear
-            #a = (1.0-tol)/n
-            #self.epsilon = self.epsilon - a
-        
             #Exponential (a^t equivalent to exp(-at) for this choice of a)
-            a = math.log(tol)/n
-            self.epsilon = math.exp(a*self.trial)
+            #Best with n=200, epsilon_val_at_n=0.05, tolerance=0.001, alpha=0.04
+            #a = math.log(self.epsilon_val_at_n)/self.n
+            #self.epsilon = 0.4*math.exp(a*self.trial)
+            
+            print self.epsilon
+            
+            #Wavy Exponential (add a cosine term)
+            #a = math.log(self.epsilon_val_at_n)/n
+            #self.epsilon = math.exp(a*self.trial)
             #self.epsilon = self.epsilon*(1 + 0.4*(math.cos(math.pi/8*self.trial)))
             #self.epsilon = min(self.epsilon,1)
             #self.epsilon = max(self.epsilon,0)
             
             #Rational (Linear Denominator)
-            #a = (1.0-tol)/((n-1.0)*tol)
+            #a = (1.0-self.epsilon_val_at_n)/((self.n-1.0)*self.epsilon_val_at_n)
             #b = 1.0-a
             #self.epsilon = 1/(a*self.trial + b)
                 
             #Rational (Polynomial Denominator)
-            #a = (1-tol)/((n**2-1)*tol)
+            #a = (1-self.epsilon_val_at_n)/((self.n**2-1)*self.epsilon_val_at_n)
             #b = 1-a
             #self.epsilon = 1/(a*(self.trial**2) + b)
         
             #Logistic
-            #a = math.log(((tol)**2)/((1-tol)**2)) / (n-1.0)
-            #b = math.log((1.0-tol)/tol) - a
+            #a = math.log(((self.epsilon_val_at_n)**2)
+            #                /((1-self.epsilon_val_at_n)**2)) / (self.n-1.0)
+            #b = math.log((1.0-self.epsilon_val_at_n)/self.epsilon_val_at_n) - a
             #self.epsilon = 1.0-1.0/(1.0+math.exp(a*self.trial+b))
 
             #if self.epsilon < 0 or self.epsilon > 1: 
@@ -104,7 +114,7 @@ class LearningAgent(Agent):
         # Set 'state' as a tuple of relevant data for the agent        
         state = (waypoint,
                 inputs['light'],
-                inputs['oncoming'],# != None,
+                inputs['oncoming'],
                 inputs['left'] != None)
         # This type of feature transformation was suggested by a Udacity Coach in the forum: 
         #https://discussions.udacity.com/t/i-dont-know-if-this-idea-is-a-kind-of-cheating/170894
@@ -205,16 +215,8 @@ def run():
     """ Driving function for running the simulation. 
         Press ESC to close the simulation, or [SPACE] to pause the simulation. """
     
-    #Set Random Seed for Reproducibility
-    #random.seed(1921) #seed 1
-    #random.seed(1557) #seed 2
-    #random.seed(1999) #seed 3
-    #random.seed(2011)  #seed 4
-    #random.seed(1066)  #seed 5
-    #random.seed(1982)  #seed 6
-    #random.seed(327)  #seed 7
-    
-    #Set Test Seeds (Not used for training/parameter tuning)
+    #Set random seed for displayed results
+    random.seed(1901)
     
     ##############
     # Create the environment
@@ -230,7 +232,7 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent,learning=True,alpha=0.4)
+    agent = env.create_agent(LearningAgent,learning=True,alpha=0.8)
     
     ##############
     # Follow the driving agent
@@ -252,7 +254,7 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(tolerance=0.001,n_test=100)
+    sim.run(n_test=100,tolerance=0.01)
 
 
 if __name__ == '__main__':

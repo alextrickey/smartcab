@@ -24,7 +24,7 @@ class LearningAgent(Agent):
         
         # Epsilon Decay Function Parameters
         self.n = 100
-        self.epsilon_val_at_n = 0.002
+        self.epsilon_val_at_n = 0.00285
 
     def reset(self, destination=None, testing=False):
         """ The reset function is called at the beginning of each trial.

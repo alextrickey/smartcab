@@ -6,8 +6,73 @@ from simulator import Simulator
 
 class LearningAgent(Agent):
     """ An agent that learns to drive in the Smartcab world.
-        This is the object you will be modifying. """ 
+        This is the object you will be modifying. """
 
+    def exploration_functions(self):
+        """ Define exploration factor functions and parameters. """
+        
+        def linear(self):
+            self.a = (1-self.epsilon_val_at_n)/self.n
+            self.trial += 1
+            self.epsilon = 1 - self.a*self.trial
+            
+        def exponential(self):
+            #Exponential (a^t equivalent to exp(-at) for this choice of a)
+            #Ok res with n=200, epsilon_val_at_n=0.05, tolerance=0.001, alpha=0.04
+            self.a = math.log(self.epsilon_val_at_n)/self.n
+            self.epsilon = math.exp(self.a*self.trial)
+            self.trial += 1
+        
+        def exponential2(self):
+            #Exponential (a^t equivalent to exp(-at) for this choice of a)
+            #Ok res with n=200, epsilon_val_at_n=0.05, tolerance=0.001, alpha=0.04
+            self.a = math.log(self.epsilon_val_at_n)/self.n
+            self.epsilon = 0.4*math.exp(self.a*self.trial)
+            self.trial += 1
+        
+        #Wavy Exponential (add a cosine term)
+        #a = math.log(self.epsilon_val_at_n)/n
+        #self.epsilon = math.exp(a*self.trial)
+        #self.epsilon = self.epsilon*(1 + 0.4*(math.cos(math.pi/8*self.trial)))
+        #self.epsilon = min(self.epsilon,1)
+        #self.epsilon = max(self.epsilon,0)
+        
+        def rational_linear(self):
+            #Rational (Linear Denominator)
+            self.a = (1.0-self.epsilon_val_at_n)/((self.n-1.0)*self.epsilon_val_at_n)
+            self.b = 1.0-self.a
+            self.epsilon = 1/(self.a*self.trial + self.b)
+            self.trial += 1
+            
+        def rational_polynomial(self):
+            #Rational (Polynomial Denominator)
+            self.a = (1-self.epsilon_val_at_n)/((self.n**2-1)*self.epsilon_val_at_n)
+            self.b = 1-self.a
+            self.epsilon = 1/(self.a*(self.trial**2) + self.b)
+            self.trial += 1
+        
+        def logistic(self):
+            #Logistic
+            self.a = math.log(((self.epsilon_val_at_n)**2)
+                        /((1-self.epsilon_val_at_n)**2)) / (self.n-1.0)
+            self.b = math.log((1.0-self.epsilon_val_at_n)/self.epsilon_val_at_n) - self.a
+            self.epsilon = 1.0-1.0/(1.0+math.exp(self.a*self.trial+self.b))
+            self.trial += 1
+        
+        
+        self.exploration_functions = {
+            'linear': linear,
+            'exponential': exponential,
+            'exponential2': exponential2,
+            'rational_linear': rational_linear,
+            'rational_polynomial': rational_polynomial,
+            'logistic': logistic
+        }
+
+    def get_epsilon(self):
+        self.exploration_functions[self.exploration_type](self)
+ 
+ 
     def __init__(self, env, learning=False, epsilon=1.0, alpha=0.5):
         super(LearningAgent, self).__init__(env)     # Set the agent in the evironment 
         self.planner = RoutePlanner(self.env, self)  # Create a route planner
@@ -23,9 +88,14 @@ class LearningAgent(Agent):
         self.trial = 0
         
         # Epsilon Decay Function Parameters
-        self.n = 100
-        self.epsilon_val_at_n = 0.00285
-
+        self.n = 300
+        self.epsilon_val_at_n = 0.001
+        self.exploration_type = 'logistic'
+        
+        #Build exploration factor functions
+        self.exploration_functions()
+            
+    
     def reset(self, destination=None, testing=False):
         """ The reset function is called at the beginning of each trial.
             'testing' is set to True if testing trials are being used
@@ -41,45 +111,7 @@ class LearningAgent(Agent):
         
         # Set training exploration factor
         else:
-            # Linear
-            if self.trial > 0: 
-                self.epsilon = self.epsilon - self.epsilon_val_at_n
-            
-            # Update epsilon using a decay function of your choice
-            self.trial += 1
-            
-            #Exponential (a^t equivalent to exp(-at) for this choice of a)
-            #Best with n=200, epsilon_val_at_n=0.05, tolerance=0.001, alpha=0.04
-            #a = math.log(self.epsilon_val_at_n)/self.n
-            #self.epsilon = 0.4*math.exp(a*self.trial)
-            
-            print self.epsilon
-            
-            #Wavy Exponential (add a cosine term)
-            #a = math.log(self.epsilon_val_at_n)/n
-            #self.epsilon = math.exp(a*self.trial)
-            #self.epsilon = self.epsilon*(1 + 0.4*(math.cos(math.pi/8*self.trial)))
-            #self.epsilon = min(self.epsilon,1)
-            #self.epsilon = max(self.epsilon,0)
-            
-            #Rational (Linear Denominator)
-            #a = (1.0-self.epsilon_val_at_n)/((self.n-1.0)*self.epsilon_val_at_n)
-            #b = 1.0-a
-            #self.epsilon = 1/(a*self.trial + b)
-                
-            #Rational (Polynomial Denominator)
-            #a = (1-self.epsilon_val_at_n)/((self.n**2-1)*self.epsilon_val_at_n)
-            #b = 1-a
-            #self.epsilon = 1/(a*(self.trial**2) + b)
-        
-            #Logistic
-            #a = math.log(((self.epsilon_val_at_n)**2)
-            #                /((1-self.epsilon_val_at_n)**2)) / (self.n-1.0)
-            #b = math.log((1.0-self.epsilon_val_at_n)/self.epsilon_val_at_n) - a
-            #self.epsilon = 1.0-1.0/(1.0+math.exp(a*self.trial+b))
-
-            #if self.epsilon < 0 or self.epsilon > 1: 
-            #    raise NameError('Epsilon out of bounds.')
+            self.get_epsilon()
 
         return None
 
@@ -216,7 +248,7 @@ def run():
         Press ESC to close the simulation, or [SPACE] to pause the simulation. """
     
     #Set random seed for displayed results
-    random.seed(1901)
+    #random.seed(1901)
     
     ##############
     # Create the environment
@@ -232,7 +264,7 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent,learning=True,alpha=0.8)
+    agent = env.create_agent(LearningAgent,learning=True,alpha=0.5)
     
     ##############
     # Follow the driving agent
@@ -254,7 +286,7 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test=100,tolerance=0.01)
+    sim.run(n_test=100,tolerance=0.001)
 
 
 if __name__ == '__main__':

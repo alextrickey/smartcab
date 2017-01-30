@@ -247,7 +247,7 @@ def run():
     """ Driving function for running the simulation. 
         Press ESC to close the simulation, or [SPACE] to pause the simulation. """
     
-    #Set random seed for displayed results
+    #Use random seed for results displayed in report
     #random.seed(1901)
     
     ##############
@@ -264,7 +264,7 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent,learning=True,alpha=0.5)
+    agent = env.create_agent(LearningAgent,learning=True,alpha=0.7)
     
     ##############
     # Follow the driving agent

@@ -247,9 +247,9 @@ def run():
         Press ESC to close the simulation, or [SPACE] to pause the simulation. """
     
     #Use random seed for results displayed in report
-    #random.seed(1901) #default learning
+    random.seed(1901) #default learning
     #random.seed(1902) #improved learning
-    random.seed(1903) #
+    #random.seed(1903) #improved learning
     
     ##############
     # Create the environment
@@ -287,7 +287,7 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test=100,tolerance=0.001)
+    sim.run(n_test=100,tolerance=0.0005)
 
 
 if __name__ == '__main__':

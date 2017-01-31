@@ -8,6 +8,29 @@ class LearningAgent(Agent):
     """ An agent that learns to drive in the Smartcab world.
         This is the object you will be modifying. """
 
+ 
+    def __init__(self, env, learning=False, epsilon=1.0, alpha=0.5):
+        super(LearningAgent, self).__init__(env)     # Set the agent in the evironment 
+        self.planner = RoutePlanner(self.env, self)  # Create a route planner
+        self.valid_actions = self.env.valid_actions  # The set of valid actions
+
+        # Set parameters of the learning agent
+        self.learning = learning # Whether the agent is expected to learn
+        self.Q = dict()          # Create a Q-table which will be a dictionary of tuples
+        self.epsilon = epsilon   # Random exploration factor
+        self.alpha = alpha       # Learning factor
+
+        # Trial Number
+        self.trial = 0
+        
+        # Epsilon Decay Function Parameters
+        self.n = 275
+        self.epsilon_val_at_n = 0.01
+        self.exploration_type = 'logistic'
+        
+        #Build exploration factor functions
+        self.exploration_functions()
+
     def exploration_functions(self):
         """ Define exploration factor functions and parameters. """
         
@@ -70,31 +93,7 @@ class LearningAgent(Agent):
         }
 
     def get_epsilon(self):
-        self.exploration_functions[self.exploration_type](self)
- 
- 
-    def __init__(self, env, learning=False, epsilon=1.0, alpha=0.5):
-        super(LearningAgent, self).__init__(env)     # Set the agent in the evironment 
-        self.planner = RoutePlanner(self.env, self)  # Create a route planner
-        self.valid_actions = self.env.valid_actions  # The set of valid actions
-
-        # Set parameters of the learning agent
-        self.learning = learning # Whether the agent is expected to learn
-        self.Q = dict()          # Create a Q-table which will be a dictionary of tuples
-        self.epsilon = epsilon   # Random exploration factor
-        self.alpha = alpha       # Learning factor
-
-        # Trial Number
-        self.trial = 0
-        
-        # Epsilon Decay Function Parameters
-        self.n = 300
-        self.epsilon_val_at_n = 0.001
-        self.exploration_type = 'logistic'
-        
-        #Build exploration factor functions
-        self.exploration_functions()
-            
+        self.exploration_functions[self.exploration_type](self)         
     
     def reset(self, destination=None, testing=False):
         """ The reset function is called at the beginning of each trial.
@@ -248,7 +247,9 @@ def run():
         Press ESC to close the simulation, or [SPACE] to pause the simulation. """
     
     #Use random seed for results displayed in report
-    #random.seed(1901)
+    #random.seed(1901) #default learning
+    #random.seed(1902) #improved learning
+    random.seed(1903) #
     
     ##############
     # Create the environment

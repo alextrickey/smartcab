@@ -39,7 +39,6 @@ class LearningAgent(Agent):
         
         def linear(self):
             self.a = (1-self.epsilon_val_at_n)/self.n
-            self.trial += 1
             self.epsilon = 1 - self.a*self.trial
             
         def exponential(self):
@@ -47,28 +46,24 @@ class LearningAgent(Agent):
             #Ok res with n=200, epsilon_val_at_n=0.05, tolerance=0.001, alpha=0.04
             self.a = math.log(self.epsilon_val_at_n)/self.n
             self.epsilon = math.exp(self.a*self.trial)
-            self.trial += 1
         
         def exponential2(self):
             #Exponential (a^t equivalent to exp(-at) for this choice of a)
             #Ok res with n=200, epsilon_val_at_n=0.05, tolerance=0.001, alpha=0.04
             self.a = math.log(self.epsilon_val_at_n)/self.n
             self.epsilon = 0.4*math.exp(self.a*self.trial)
-            self.trial += 1
         
         def rational_linear(self):
             #Rational (Linear Denominator)
             self.a = (1.0-self.epsilon_val_at_n)/((self.n-1.0)*self.epsilon_val_at_n)
             self.b = 1.0-self.a
             self.epsilon = 1/(self.a*self.trial + self.b)
-            self.trial += 1
             
         def rational_polynomial(self):
             #Rational (Polynomial Denominator)
             self.a = (1-self.epsilon_val_at_n)/((self.n**2-1)*self.epsilon_val_at_n)
             self.b = 1-self.a
             self.epsilon = 1/(self.a*(self.trial**2) + self.b)
-            self.trial += 1
         
         def sigmoid(self):
             #Logistic
@@ -76,7 +71,6 @@ class LearningAgent(Agent):
                         /((1-self.epsilon_val_at_n)**2)) / (self.n-1.0)
             self.b = math.log((1.0-self.epsilon_val_at_n)/self.epsilon_val_at_n) - self.a
             self.epsilon = 1.0-1.0/(1.0+math.exp(self.a*self.trial+self.b))
-            self.trial += 1
         
         # Store in dict to facilitate switching between functions
         self.exploration_functions = {
@@ -109,6 +103,7 @@ class LearningAgent(Agent):
             self.epsilon = 0
         else:
             self.get_epsilon()
+            self.trial += 1
 
         return None
 

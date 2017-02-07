@@ -154,30 +154,25 @@ class LearningAgent(Agent):
 
 
     def get_maxQ(self, state):
-        """ The get_maxQ function is called when the agent is asked to find the
+        """ The get_action_with_maxQ function is called when the agent is asked to find the
             maximum Q-value of all actions based on the 'state' the smartcab is in. """
 
         # Calculate the maximum Q-value of all actions for a given state
-        best_action = 'TBD'
-        for a in self.valid_actions:
-            if best_action == 'TBD': 
-                best_action = a
-            elif self.Q[state][str(best_action)] < self.Q[state][str(a)]:
-                best_action = a
+        maxQ = max(self.Q[state].values())
+        #best_action = max(self.Q[state],key=self.Q[state].get)
+        #best_action = None if best_action == 'None' else best_action
 
-        return best_action 
+        return maxQ 
         
-    def get_action_set(self, state):
-        """ Return any untested actions for a given state, else return all 
-            actions. """
+    def get_best_action_set(self, state):
+        """ Return any actions for a given state with Q=maxQ"""
 
+        print self.get_maxQ(state)
+        print self.Q[state]
         # Calculate the maximum Q-value of all actions for a given state
-        action_set = []
-        for a in self.valid_actions:
-            if self.Q[state][str(a)] == 0:
-                action_set.append(a)
-        if len(action_set) == 0:
-            action_set = self.valid_actions
+        action_set = filter(lambda a: self.Q[state][a]==self.get_maxQ(state), 
+                            self.Q[state].keys())
+        print action_set
 
         return action_set 
 
@@ -196,10 +191,12 @@ class LearningAgent(Agent):
             # When not learning, choose a random action
             action = random.choice(self.valid_actions)
         else:
-            # When learning, choose a random action with 'epsilon' probability
-            #   Otherwise, choose an action with the highest Q-value for the current state
+            # When learning, choose an action with the highest Q-value for the current state
+            #   Otherwise, choose a random action with probability 'epsilon' 
             if random.random() > self.epsilon:
-                action = self.get_maxQ(state)
+                #return keys associated with maxQ, then choose one of the optimal actions
+                action = random.choice(self.get_best_action_set(state))
+                action = None if action == 'None' else action
             else:
                 #returns set of unexplored actions (or all actions)
                 action = random.choice(self.valid_actions)
@@ -256,7 +253,7 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent,learning=True,alpha=0.7)
+    agent = env.create_agent(LearningAgent,learning=True,alpha=0.6)
     
     ##############
     # Follow the driving agent

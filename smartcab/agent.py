@@ -121,7 +121,7 @@ class LearningAgent(Agent):
             action_names = [str(a) for a in self.valid_actions]
             self.Q[state] = {}
             for a in action_names:
-                self.Q[state][a] = 10.0 
+                self.Q[state][a] = 10.0 #see comment/reference above
         return
 
 

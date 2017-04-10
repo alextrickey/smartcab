@@ -26,9 +26,10 @@ class LearningAgent(Agent):
         self.trial = 0
         
         # Epsilon Decay Function Parameters
-        self.n = 275
-        self.epsilon_val_at_n = 0.01
-        self.exploration_type = 'sigmoid'
+        self.n = 350
+        self.n2 = 275
+        self.epsilon_val_at_n = 0.001
+        self.exploration_type = 'sigmoid_shift'
         
         #Build exploration factor functions
         self.exploration_functions()
@@ -72,6 +73,13 @@ class LearningAgent(Agent):
             self.b = math.log((1.0-self.epsilon_val_at_n)/self.epsilon_val_at_n) - self.a
             self.epsilon = 1.0-1.0/(1.0+math.exp(self.a*self.trial+self.b))
         
+        def sigmoid_shift(self):
+            #Logistic
+            self.a = (math.log((self.epsilon_val_at_n) /(1-self.epsilon_val_at_n)) / 
+                     (self.n-self.n2))
+            self.b = -self.a * self.n2
+            self.epsilon = 1.0-1.0/(1.0+math.exp(self.a*self.trial+self.b))
+        
         # Store in dict to facilitate switching between functions
         self.exploration_functions = {
             'linear': linear,
@@ -79,7 +87,8 @@ class LearningAgent(Agent):
             'exponential2': exponential2,
             'rational_linear': rational_linear,
             'rational_polynomial': rational_polynomial,
-            'sigmoid': sigmoid
+            'sigmoid': sigmoid,
+            'sigmoid_shift': sigmoid_shift
         }
 
 
@@ -237,7 +246,7 @@ def run():
         Press ESC to close the simulation, or [SPACE] to pause the simulation. """
     
     #Use random seed for results displayed in report
-    random.seed(1902) 
+    #random.seed(1902) 
     
     ##############
     # Create the environment
@@ -253,7 +262,7 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent,learning=True,alpha=0.6)
+    agent = env.create_agent(LearningAgent,learning=True,alpha=0.5)
     
     ##############
     # Follow the driving agent
@@ -275,7 +284,7 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test=100,tolerance=0.0005)
+    sim.run(n_test=100,tolerance=0.001)
 
 
 if __name__ == '__main__':

@@ -21,15 +21,18 @@ class LearningAgent(Agent):
         self.Q = dict()          # Create a Q-table which will be a dictionary of tuples
         self.epsilon = epsilon   # Random exploration factor
         self.alpha = alpha       # Learning factor
+        self.init_Qval=10        # Starting value of Q 
+        # Note, the initial Q-value was set to 10 based upon this comment in the forums:
+        # https://discussions.udacity.com/t/in-which-function-do-i-update-the-q-table-and-how/204911/9
 
         # Trial Number
         self.trial = 0
         
         # Epsilon Decay Function Parameters
-        self.n = 350
-        self.n2 = 275
-        self.epsilon_val_at_n = 0.001
-        self.exploration_type = 'sigmoid_shift'
+        self.n = 300
+        self.n2 = 150 #midpoint for shifted sigmoid decay function (not used otherwise)
+        self.epsilon_val_at_n = 0.01
+        self.exploration_type = 'sigmoid'
         
         #Build exploration factor functions
         self.exploration_functions()
@@ -124,13 +127,11 @@ class LearningAgent(Agent):
         # If it is not, create a new dictionary for that state
         #   Then, for each action available, set the initial Q-value to 0.0
         #   For each action, set the Q-value for the state-action pair to 0
-        # Updated initial value to 10 based upon this comment in the forums:
-        # https://discussions.udacity.com/t/in-which-function-do-i-update-the-q-table-and-how/204911/9
         if state not in self.Q.keys():
             action_names = [str(a) for a in self.valid_actions]
             self.Q[state] = {}
             for a in action_names:
-                self.Q[state][a] = 10.0 #see comment/reference above
+                self.Q[state][a] = self.init_Qval #defined in init()
         return
 
 
@@ -148,8 +149,7 @@ class LearningAgent(Agent):
         # Set 'state' as a tuple of relevant data for the agent        
         state = (waypoint,
                 inputs['light'],
-                inputs['oncoming'],
-                inputs['left'] != None)
+                inputs['oncoming'])
         # This type of feature transformation was suggested by a Udacity Coach in the forum: 
         #https://discussions.udacity.com/t/i-dont-know-if-this-idea-is-a-kind-of-cheating/170894
 
@@ -207,8 +207,8 @@ class LearningAgent(Agent):
                 action = random.choice(self.get_best_action_set(state))
                 action = None if action == 'None' else action
             else:
-                #returns set of unexplored actions (or all actions)
                 action = random.choice(self.valid_actions)
+                #returns set of unexplored actions (or all actions)
                 #action = random.choice(self.get_action_set(state))
  
         return action
@@ -223,7 +223,10 @@ class LearningAgent(Agent):
         #   Use only the learning rate 'alpha' (do not use the discount factor 'gamma')
         print state, action, self.Q[state]
         Qval = self.Q[state][str(action)] 
-        self.Q[state][str(action)] = (1.0-self.alpha)*Qval + self.alpha*reward
+        if Qval == self.init_Qval:
+            self.Q[state][str(action)] = reward #on 1st trial reward is best information
+        else:
+            self.Q[state][str(action)] = (1.0-self.alpha)*Qval + self.alpha*reward
         return
 
 
@@ -262,7 +265,7 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent,learning=True,alpha=0.5)
+    agent = env.create_agent(LearningAgent,learning=True,alpha=0.6)
     
     ##############
     # Follow the driving agent
@@ -284,7 +287,7 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test=100,tolerance=0.001)
+    sim.run(n_test=100,tolerance=0.0001)
 
 
 if __name__ == '__main__':

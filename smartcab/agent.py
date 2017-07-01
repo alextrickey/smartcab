@@ -31,8 +31,8 @@ class LearningAgent(Agent):
         
         # Epsilon Decay Function Parameters
         self.n = 300
-        self.n2 = 250 #midpoint for shifted sigmoid decay function (not used otherwise)
-        self.epsilon_val_at_n = 0.001
+        self.n2 = 200 #midpoint for shifted sigmoid decay function (not used otherwise)
+        self.epsilon_val_at_n = 0.01
         self.exploration_type = 'sigmoid_shift'
         
         #Build exploration factor functions
@@ -146,11 +146,13 @@ class LearningAgent(Agent):
         inputs = self.env.sense(self)           # Visual input - intersection light and traffic
         deadline = self.env.get_deadline(self)  # Remaining deadline
 
+
         # Set 'state' as a tuple of relevant data for the agent        
         state = (waypoint,
                 inputs['light'],
-                inputs['oncoming'],
-                inputs['left'])
+                inputs['oncoming'])
+        # This type of feature transformation was suggested by a Udacity Coach in the forum: 
+        #https://discussions.udacity.com/t/i-dont-know-if-this-idea-is-a-kind-of-cheating/170894
 
         # When learning, check if the state is in the Q-table
         #   If it is not, create a dictionary in the Q-table for the current 'state'
@@ -206,14 +208,11 @@ class LearningAgent(Agent):
                 #uniform random selection
                 #action = random.choice(self.valid_actions)
                 
-                #weighted random selection (use Q-values to calculate softmax probs)
+                #softmax weighted random selection
                 scale = sum([math.exp(self.Q[state][a]) for a in self.Q[state]])
                 action_probs = [(a,math.exp(self.Q[state][a])/scale) for a in self.Q[state]]
                 action = choice([a[0] for a in action_probs],p=[a[1] for a in action_probs])
-                #note, this is still random selection, but it down-weights options that are 
-                #clearly bad so that the exploration can focus on smaller differences in 
-                #rewards that are more difficult to resolve
-                #Reference: 
+                
             action = None if action == 'None' else action
  
         return action
@@ -227,7 +226,7 @@ class LearningAgent(Agent):
         # When learning, implement the value iteration update rule
         #   Use only the learning rate 'alpha' (do not use the discount factor 'gamma')
         print state, action, self.Q[state]
-        Qval = self.Q[state][str(action)]
+        Qval = self.Q[state][str(action)] 
         if Qval == self.init_Qval:
             self.Q[state][str(action)] = reward #on 1st trial reward is best information
         else:
@@ -254,7 +253,7 @@ def run():
         Press ESC to close the simulation, or [SPACE] to pause the simulation. """
     
     #Use random seed for results displayed in report
-    #random.seed(1902) 
+    random.seed(1902) 
     
     ##############
     # Create the environment
@@ -270,7 +269,7 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent,learning=True,alpha=0.5)
+    agent = env.create_agent(LearningAgent,learning=True,alpha=0.4)
     
     ##############
     # Follow the driving agent
@@ -292,7 +291,7 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test=100,tolerance=0.001)
+    sim.run(n_test=100,tolerance=0.0001)
 
 
 if __name__ == '__main__':

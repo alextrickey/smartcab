@@ -30,9 +30,9 @@ class LearningAgent(Agent):
         self.trial = 0
         
         # Epsilon Decay Function Parameters
-        self.n = 300
+        self.n = 350
         self.n2 = 200 #midpoint for shifted sigmoid decay function (not used otherwise)
-        self.epsilon_val_at_n = 0.01
+        self.epsilon_val_at_n = 0.0001
         self.exploration_type = 'sigmoid_shift'
         
         #Build exploration factor functions
@@ -253,7 +253,7 @@ def run():
         Press ESC to close the simulation, or [SPACE] to pause the simulation. """
     
     #Use random seed for results displayed in report
-    random.seed(1902) 
+    #random.seed(1902) 
     
     ##############
     # Create the environment

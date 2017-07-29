@@ -151,8 +151,6 @@ class LearningAgent(Agent):
         state = (waypoint,
                 inputs['light'],
                 inputs['oncoming'])
-        # This type of feature transformation was suggested by a Udacity Coach in the forum: 
-        #https://discussions.udacity.com/t/i-dont-know-if-this-idea-is-a-kind-of-cheating/170894
 
         # When learning, check if the state is in the Q-table
         #   If it is not, create a dictionary in the Q-table for the current 'state'
@@ -169,16 +167,12 @@ class LearningAgent(Agent):
 
         # Calculate the maximum Q-value of all actions for a given state
         maxQ = max(self.Q[state].values())
-        #best_action = max(self.Q[state],key=self.Q[state].get)
-        #best_action = None if best_action == 'None' else best_action
 
         return maxQ 
         
     def get_best_action_set(self, state):
         """ Return any actions for a given state with Q=maxQ"""
 
-        print self.get_maxQ(state)
-        print self.Q[state]
         # Calculate the maximum Q-value of all actions for a given state
         action_set = filter(lambda a: self.Q[state][a]==self.get_maxQ(state), 
                             self.Q[state].keys())
@@ -201,14 +195,18 @@ class LearningAgent(Agent):
         else:
             # When learning, choose an action with the highest Q-value for the current state
             #   Otherwise, choose a random action with probability 'epsilon' 
-            if random.random() > self.epsilon:
+            if random.random() > self.epsilon: 
+                #exploit
                 #return key(s) associated with maxQ, then choose one of the optimal actions
                 action = random.choice(self.get_best_action_set(state))
-            else:
-                #uniform random selection
+            else: 
+                #explore
+                
+                #uniform weighted random selection
                 #action = random.choice(self.valid_actions)
                 
                 #softmax weighted random selection
+                #see Question 7 "Additional Improvements" for explanation/references
                 scale = sum([math.exp(self.Q[state][a]) for a in self.Q[state]])
                 action_probs = [(a,math.exp(self.Q[state][a])/scale) for a in self.Q[state]]
                 action = choice([a[0] for a in action_probs],p=[a[1] for a in action_probs])
@@ -253,7 +251,7 @@ def run():
         Press ESC to close the simulation, or [SPACE] to pause the simulation. """
     
     #Use random seed for results displayed in report
-    #random.seed(1902) 
+    random.seed(1902)
     
     ##############
     # Create the environment

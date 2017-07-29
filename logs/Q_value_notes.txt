@@ -1,0 +1,194 @@
+/-----------------------------------------
+| State-action rewards from Q-Learning
+\-----------------------------------------
+
+--------------------------
+Scenario: Right on Green
+-- Cab has right of way
+-- Should turn right
+-- 4/4 correct
+--------------------------
+
+('right', 'green', None)
+ -- forward : 1.12
+ -- None : -5.37
+ -- right : 1.32 -- max
+ -- left : 1.17
+
+('right', 'green', 'right')
+ -- forward : 0.60
+ -- None : -4.26
+ -- right : 1.69 --max
+ -- left : -20.23
+
+('right', 'green', 'left')
+ -- forward : 0.79
+ -- None : 1.01
+ -- right : 1.82 --max
+ -- left : 0.55
+  
+('right', 'green', 'forward')
+  -- forward : 0.82
+  -- None : -5.65
+  -- right : 2.02 --max
+  -- left : -20.64
+
+
+--------------------------
+Scenario: Right on Red
+-- Cab does not have right of way
+-- Should wait (because 
+	the cab does not know about 
+	traffic on the left).
+-- 4/4 correct
+--------------------------
+('right', 'red', 'forward')
+ -- forward : -10.92
+ -- None : 1.93 --max
+ -- right : -6.94
+ -- left : -39.16
+
+('right', 'red', 'left')
+ -- forward : -10.15
+ -- None : 1.60 --max
+ -- right : -6.67
+ -- left : -10.94
+
+('right', 'red', 'right')
+ -- forward : -10.33
+ -- None : 2.20 --max
+ -- right : -6.69
+ -- left : -40.55
+
+('right', 'red', None)
+  -- forward : -10.15
+  -- None : 1.53 --max
+  -- right : -7.62
+  -- left : -9.69
+   
+
+--------------------------
+Scenario: Left on Green
+-- Should go forward with oncoming=Forward/Right
+-- Otherwise it should turn left
+-- 3/4 correct
+--------------------------
+('left', 'green', 'forward')
+ -- forward : 1.15 --max
+ -- None : -5.43
+ -- right : 0.22
+ -- left : -19.67
+
+('left', 'green', 'right')
+ -- forward : 0.07
+ -- None : -4.03
+ -- right : 1.04 --max --Not Optimal
+ -- left : -19.94
+
+('left', 'green', 'left')
+ -- forward : 0.49
+ -- None : 0.47
+ -- right : 0.64
+ -- left : 1.27 --max
+
+('left', 'green', None)
+ -- forward : 0.64
+ -- None : -5.64
+ -- right : 0.35
+ -- left : 1.23 --max
+
+
+ --------------------------
+ Scenario: Left on Red
+ -- Cab does not have right of way
+ -- Action should be None
+ -- 4/4 correct
+ --------------------------
+('left', 'red', 'left')
+ -- forward : -39.96
+ -- None : 2.12 --max
+ -- right : -7.51
+ -- left : -39.82
+
+('left', 'red', 'forward')
+ -- forward : -39.96
+ -- None : 2.09 --max
+ -- right : -7.95
+ -- left : -40.11
+
+('left', 'red', None)
+ -- forward : -9.01
+ -- None : 2.07 --max
+ -- right : -7.94
+ -- left : -10.45
+
+('left', 'red', 'right')
+ -- forward : -40.30
+ -- None : 1.61 --max
+ -- right : -20.04
+ -- left : -39.54
+
+
+ --------------------------
+ Scenario: Forward on Green
+ -- Cab has right of way
+ -- Should go forward
+ -- 4/4 correct
+ --------------------------
+('forward', 'green', 'left')
+ -- forward : 2.01 --max
+ -- None : 0.79
+ -- right : 0.81
+ -- left : 1.18
+
+('forward', 'green', 'right')
+ -- forward : 2.26 --max
+ -- None : -5.04
+ -- right : 0.56
+ -- left : -19.04
+
+('forward', 'green', None)
+ -- forward : 2.36 --max
+ -- None : -4.87
+ -- right : 0.92
+ -- left : 1.06
+  
+('forward', 'green', 'forward')
+ -- forward : 1.74 --max
+ -- None : -4.13
+ -- right : 0.96
+ -- left : -19.27
+   
+   
+--------------------------
+Scenario: Forward on Red
+-- Cab does not have right of way
+-- Should wait
+-- 4/4 correct
+--------------------------
+('forward', 'red', 'forward')
+ -- forward : -10.56
+ -- None : 1.52 --max
+ -- right : -7.52
+ -- left : -9.07
+
+('forward', 'red', 'right')
+ -- forward : -9.54
+ -- None : 2.16 --max
+ -- right : -7.09
+ -- left : -40.32
+
+('forward', 'red', 'left')
+ -- forward : -10.05
+ -- None : 1.87 --max
+ -- right : -20.98
+ -- left : -10.36
+
+('forward', 'red', None)
+ -- forward : -9.33
+ -- None : 1.80 --max
+ -- right : -7.75
+ -- left : -9.20
+
+
+
